@@ -411,16 +411,20 @@ void UIManager::printState() {
     } else if (m_connectionStatus == avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::Status::CONNECTED) {
         switch (m_dialogState) {
             case DialogUXState::IDLE:
+                std::cout << "VCR.IDLE" << std::endl;
                 ConsolePrinter::prettyPrint("Alexa is currently idle!");
                 return;
             case DialogUXState::LISTENING:
+                std::cout << "VCR.LISTENING" << std::endl;
                 ConsolePrinter::prettyPrint("Listening...");
                 return;
             case DialogUXState::THINKING:
+                std::cout << "VCR.THINKING" << std::endl;
                 ConsolePrinter::prettyPrint("Thinking...");
                 return;
                 ;
             case DialogUXState::SPEAKING:
+                std::cout << "VCR.SPEAKING" << std::endl;
                 ConsolePrinter::prettyPrint("Speaking...");
                 return;
             /*

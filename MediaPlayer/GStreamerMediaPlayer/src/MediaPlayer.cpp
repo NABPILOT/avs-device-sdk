@@ -91,6 +91,9 @@ static const int8_t GST_ADJUST_VOLUME_MAX = 1;
 /// Represents the zero volume to avoid the actual 0.0 value. Used as a fix for GStreamer crashing on 0 volume for PCM.
 static const gdouble VOLUME_ZERO = 0.0000001;
 
+/// AB: The alternative URL we feed to GStreamer when we're offloading playback elsewhere
+static const std::string SILENCE_URL = "http://127.0.0.1:8000/silence.mp3";
+
 /**
  * Processes tags found in the tagList.
  * Called through gst_tag_list_foreach.
@@ -1212,8 +1215,11 @@ void MediaPlayer::handleSetUrlSource(
 
     tearDownTransientPipelineElements(true);
 
+    // AB: output the URL for handling elsewhere
+    std::cout << "VCR.PLAY=" << url << std::endl;
+
     m_urlConverter = alexaClientSDK::playlistParser::UrlContentToAttachmentConverter::create(
-        m_contentFetcherFactory, url, shared_from_this(), offset);
+        m_contentFetcherFactory, SILENCE_URL, shared_from_this(), offset);
     if (!m_urlConverter) {
         ACSDK_ERROR(LX("setSourceUrlFailed").d("reason", "badUrlConverter"));
         promise->set_value(ERROR_SOURCE_ID);
@@ -1334,6 +1340,9 @@ void MediaPlayer::handleStop(MediaPlayer::SourceId id, std::promise<bool>* promi
         promise->set_value(false);
         return;
     }
+
+    // AB: output stop command
+    std::cout << "VCR.STOP" << std::endl;
 
     stateChangeRet = gst_element_set_state(m_pipeline.pipeline, GST_STATE_NULL);
     if (GST_STATE_CHANGE_FAILURE == stateChangeRet) {
